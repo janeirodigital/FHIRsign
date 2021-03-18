@@ -46,12 +46,14 @@ export class FHIRSign {
         // JWS protected headers:
         const headers = { "alg": "ES256", "issuer": issuer };
         const sig = this.encJwsEcdsa(hashString, headers);
-        console.log('sig:', sig);
 
-        const got = this.decJwsEcdsa(sig);
-
-        console.log('got:', JSON.stringify(got, null, 2));
+        return sig; // !! Should be signed resource.
     }
+
+    check(sig: string): object {
+        return this.decJwsEcdsa(sig); // !! should be orig resource.
+    }
+
 
     encJwsEcdsa(payloadStr: string, headers: ProtectedHeaders = {}) {
         // Create the JWS Protected Header
