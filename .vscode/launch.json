@@ -1,0 +1,41 @@
+{
+  "version":"0.2.0",
+  "configurations": [
+    {
+      "name": "FHIRsign",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register/transpile-only"],
+      "args": [
+        "FHIRsign.ts",
+        "codesystem-medicationrequest-intent.json"
+      ],
+      "cwd": "${workspaceRoot}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "skipFiles": [
+        // "node_modules/**",
+        "<node_internals>/**"
+      ],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request":"launch",
+      "name": "Debug tests",
+      "program": "${workspaceFolder}/node_modules/ts-mocha/bin/ts-mocha",
+      "args": [
+        "--paths",
+        "--colors",
+        "--timeout", "0",
+        "'${workspaceFolder}/tests/**/*.ts'"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector"
+    }
+  ]
+}

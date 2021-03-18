@@ -1,0 +1,72 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "medrx0301",
+  "text": { "status": "generated", "div": "..." },
+  "contained": [
+    { "resourceType": "Medication",
+      "id": "med0310",
+      "code": {
+        "coding": [
+          { "system": "http://snomed.info/sct",
+            "code": "430127000", "display": "Oxycodone" }
+        ] } },
+    {
+      "resourceType": "Provenance",
+      "id": "signature",
+      "target": [ { "reference": "ServiceRequest/physiotherapy" } ],
+      "recorded": "2017-02-01T17:23:07Z",
+      "agent": [
+        { "role": [
+            { "coding": [
+                { "system": "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                  "code": "AUT" }
+              ] }
+          ],
+          "who": {
+            "reference": "Practitioner/example",
+            "display": "Dr Adam Careful" } }
+      ],
+      "signature": [
+        { "type": [
+            { "system": "urn:iso-astm:E1762-95:2013",
+              "code": "1.2.840.10065.1.12.1.1",
+              "display": "Author\u0027s Signature" }
+          ],
+          "when": "2017-02-01T17:23:07Z",
+          "who": {
+            "reference": "Practitioner/example",
+            "display": "Dr Adam Careful" },
+          "targetFormat": "application/fhir+xml",
+          "sigFormat": "application/signature+xml",
+          "data": "dGhpcyBibG9iIGlzIHNuaXBwZWQ\u003d" }
+      ] }
+  ],
+  "identifier": [
+    { "system": "http://www.bmc.nl/portal/prescriptions",
+      "value": "12345689", "use": "official" }
+  ],
+  "status": "completed",
+  "intent": "order",
+  "medicationReference": { "reference": "#med0310" },
+  "subject": { "reference": "Patient/pat1" },
+  "authoredOn": "2015-01-15",
+  "dosageInstruction": [
+    { "sequence": 1,
+      "text": "one to two tablets every 4-6 hours as needed for rib pain",
+      "patientInstruction": "Take one",
+      "timing": {
+        "repeat": { "frequency": 1, "period": 4, "periodMax": 6, "periodUnit": "h" } },
+      "route": { "coding": [ { "system": "http://snomed.info/sct",
+                               "code": "26643006", "display": "Oral Route" } ] },
+      "method": { "coding": [ { "system": "http://snomed.info/sct",
+                                "code": "421521009", "display": "Swallow" } ] } }
+  ],
+  "eventHistory": [
+    { "reference": "#signature", "display": "Author\u0027s Signature" }
+  ],
+  "meta": {
+    "tag": [
+      { "system": "http://terminology.hl7.org/CodeSystem/v3-ActReason",
+        "code": "HTEST", "display": "test health data" }
+    ] }
+}

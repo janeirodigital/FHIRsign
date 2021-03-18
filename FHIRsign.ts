@@ -1,4 +1,12 @@
-const chilkat = require('@chilkat/ck-node14-linux64');
+const Fs = require('fs');
+
+const chilkat = require('@chilkat/ck-node14-linux64'); // { PublicKey,PrivateKey,JsonObject,Jws,StringBuilder }
+const canonicalize = require('canonicalize');
+
+const pubKeyFilePath = "examples/pubKey.json";
+const privKeyFilePath = "examples/privKey.json";
+const resourceFilePath = "examples/medicationrequest0301-lite.json";
+const issuerParm = "yourMom";
 
 interface ProtectedHeaders { [name: string]: string }
 
@@ -71,37 +79,46 @@ class FHIRSign {
         };
     }
 }
-// (global-set-key (kbd "<backtab>") 'company-complete)
-const s = new FHIRSign({
-    "kty": "EC",
-    "crv": "P-256",
-    "x": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
-    "y": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
-}, {
-    "kty": "EC",
-    "crv": "P-256",
-    "x": "f83OJ3D2xF1Bg8vub9tLe1gHMzV76e8Tus9uPHvRVEU",
-    "y": "x_FEzRu9m36HLN_tue659LNpXW6pCyStikYjKIWI5a0",
-    "d": "jpsQnnGQmL-YBIffH1136cspYG6-0iY7X1fCE9-E9LI",
-})
 
-const resource = {
-    "resourceType": "CodeSystem",
-    "id": "medicationrequest-intent",
-    "meta": {
-        "lastUpdated": "2019-11-16T11:53:58.181+01:00",
-        "profile": ["http://hl7.org/fhir/StructureDefinition/shareablecodesystem"]
-    },
+function readJson(filePath: string) {
+    return JSON.parse(Fs.readFileSync(filePath));
 }
 
-const headers = { "alg": "ES256", "issuer": "adsf" };
-const payload = JSON.stringify(resource);
-const sig = s.encJwsEcdsa(payload, headers);
-console.log('sig:', sig);
-const got = s.decJwsEcdsa(sig);
-console.log('got:', JSON.stringify(got, null, 2));
+// (global-set-key (kbd "<backtab>") 'company-complete)
+const s = new FHIRSign(readJson(pubKeyFilePath), readJson(privKeyFilePath));
 
-// const sigString = s.encJwsEcdsa("In our village, folks say God crumbles up the old moon into stars.", headers);
-// console.log('sigstring:', sigString);
-// const sig2 = s.decJwsEcdsa(sig2)
-// console.log('result:', JSON.stringify(sig2, null, 2));
+const resource = readJson(resourceFilePath);
+
+// Pretend to parameterize this (but leave explicit code for debuggability).
+const Algorithms = {
+    "ES256": {
+        hash: {
+            HashAlgorithm: "sha256",
+            Charset: "utf-8",
+        },
+        encode: "encJwsEcdsa",
+        decode: "decJwsEcdsa",
+    }
+};
+
+// JWS protected headers:
+const headers = { "alg": "ES256", "issuer": issuerParm };
+
+// Hash resource.
+const payload = canonicalize(resource);
+const crypt = new chilkat.Crypt2();
+crypt.HashAlgorithm = "sha256";
+crypt.Charset = "utf-8";
+const hashBytes = crypt.HashString(payload);
+
+// Hex-encode bytes with an arbitrary prefix string to give warm fuzzies.
+const sb = new chilkat.StringBuilder();
+sb.AppendEncoded(hashBytes, "hex");
+const hashString = "SHA256:" + sb.GetAsString()
+
+const sig = s.encJwsEcdsa(hashString, headers);
+console.log('sig:', sig);
+
+const got = s.decJwsEcdsa(sig);
+
+console.log('got:', JSON.stringify(got, null, 2));
