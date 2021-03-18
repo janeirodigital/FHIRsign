@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ts-node FHIRsign.ts"
+    "test": "ts-node bin/sign.ts examples/pubKey.json examples/privKey.json examples/medicationrequest0301-lite.json yourMom "
   },
   "keywords": [],
   "author": "",
