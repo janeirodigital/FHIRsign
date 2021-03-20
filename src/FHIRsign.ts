@@ -1,6 +1,7 @@
 
 const chilkat = require('@chilkat/ck-node14-linux64'); // { PublicKey,PrivateKey,JsonObject,Jws,StringBuilder }
 const canonicalize = require('canonicalize');
+import { Base64 } from '../src/Base64';
 
 interface ProtectedHeaders { [name: string]: string }
 
@@ -53,12 +54,14 @@ export class FHIRSign {
    *
    * TODO: return orig resource
    */
-  check(resource: object, sig: string): object {
-    const validity = this.decodeJwsEcdsa(sig);
-    const hashString = this.hash(resource, "sha256");
-    console.log(validity.content);
-    console.log(hashString);
-    validity.hashValidity = validity.content === hashString;
+  check(resource: object, detachedSignature: string): object {
+    const [encodedHeader, encodedSignature] = detachedSignature.split('..');
+    const payload = this.hash(resource, "sha256");
+    const encodedPayload = Base64.encode(payload).replace(/=/g, '');
+    const signed = encodedHeader + '.' + encodedPayload + '.' + encodedSignature;
+
+    const validity = this.decodeJwsEcdsa(signed);
+    validity.hashValidity = validity.content === payload;
     return validity;
   }
 
