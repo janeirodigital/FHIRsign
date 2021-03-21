@@ -4,6 +4,12 @@ const canonicalize = require('canonicalize');
 import { Base64 } from '../src/Base64';
 
 interface ProtectedHeaders { [name: string]: string }
+export interface VerifyResult {
+  sigValidity: boolean,
+  hashValidity: boolean,
+  content: string,
+  headers: ProtectedHeaders
+}
 
 export class FHIRSign {
   private iz: Array<number> = [1, 2];
@@ -54,14 +60,15 @@ export class FHIRSign {
    *
    * TODO: return orig resource
    */
-  check(resource: object, detachedSignature: string): object {
+  check(resource: object, detachedSignature: string): VerifyResult {
     const [encodedHeader, encodedSignature] = detachedSignature.split('..');
     const payload = this.hash(resource, "sha256");
-    const encodedPayload = Base64.encode(payload).replace(/=/g, '');
+    Base64.keyStr = Base64.keyStr.slice(0,62) + "-_=";
+    const encodedPayload: string = Base64.encode(String(payload)).replace(/=/g, '');
     const signed = encodedHeader + '.' + encodedPayload + '.' + encodedSignature;
 
     const validity = this.decodeJwsEcdsa(signed);
-    validity.hashValidity = validity.content === payload;
+    validity.hashValidity = validity.content === String(payload);
     return validity;
   }
 
@@ -92,17 +99,13 @@ export class FHIRSign {
     jws.SetPrivateKey(signatureIndex, this.privKey);
     jws.SetPayload(payloadStr, "utf-8", false /* don't include BOM */);
 
-    // I don't see a CreateDetachedJws. Should I be able to strip
-    // out the text between the '..'s and reproduce it given the
-    // signed entity and the public key?
-
     var jwsCompact = jws.CreateJws(); // default to compact serialization
     if (jws.LastMethodSuccess !== true)
       throw Error(`CreateJws error: ${jws.LastErrorText}`);
     return jwsCompact;
   }
 
-  decodeJwsEcdsa(last: string) {
+  decodeJwsEcdsa(last: string): VerifyResult {
     var jws = new chilkat.Jws();
 
     // Set the ECC public key:
@@ -136,7 +139,7 @@ export class FHIRSign {
       sigValidity: true,
       hashValidity: false, // not yet tested
       content: jws.GetPayload("utf-8"),
-      header: JSON.parse(joseHeader.Emit()),
+      headers: JSON.parse(joseHeader.Emit()),
     };
   }
 }
