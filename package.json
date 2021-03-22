@@ -12,7 +12,8 @@
   "devDependencies": {
     "@types/node": "^14.14.35",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "vc-js": "^0.6.4"
   },
   "dependencies": {
     "@chilkat/ck-node14-linux64": "^9.50.86",

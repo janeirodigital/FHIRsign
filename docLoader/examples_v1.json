@@ -1,0 +1,8 @@
+{
+  "@context": [{
+    "@version": 1.1
+  }, "https://www.w3.org/ns/odrl.jsonld", {
+    "xform": "https://xformativ.pub/as/terms#",
+    "fileIntegrityHash": { "@id": "xform:fileIntegrityHash", "@type": "http://www.w3.org/2001/XMLSchema#" }
+  }]
+}
