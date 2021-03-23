@@ -77,8 +77,8 @@ export class FHIRSign {
     const crypt = new chilkat.Crypt2();
     crypt.HashAlgorithm = algorithm;
     crypt.Charset = "utf-8";
-    const hashBytes = crypt.HashString(payload);
-
+    const hashBytes = crypt.HashString(payload);console.log(Error().stack!.split(/\n/).slice(2,4))
+    return hashBytes;
     // Hex-encode bytes with an arbitrary prefix string to give warm fuzzies.
     const sb = new chilkat.StringBuilder();
     sb.AppendEncoded(hashBytes, "hex");
