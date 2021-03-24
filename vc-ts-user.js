@@ -18,7 +18,7 @@ async function main() {
     verificationMethod: 'https://example.edu/issuers/keys/1',
     key: keyPair, date: myDate
   });
-  let mockCredential = {
+  let myCredential = {
     "@context": ["https://www.w3.org/2018/credentials/v1", "https://my.example/v1"],
     "id": "http://example.edu/credentials/1872",
     "type": ["VerifiableCredential", "FileIntegrityCredential"],
@@ -52,11 +52,11 @@ async function main() {
   }
 
   let verifiableCredential = await vc.issue({
-    credential: mockCredential,
+    credential: myCredential,
     suite, documentLoader, compactProof: false
   });
   console.log(verifiableCredential);
-  // mockCredential.credentialSubject.fileIntegrityHash = "0123456789abcdef";
+  // myCredential.credentialSubject.fileIntegrityHash = "0123456789abcdef";
 
 
   const assertionController = {
@@ -103,13 +103,13 @@ async function main() {
     const purpose = new CredentialIssuancePurpose();
     const credential = {};
     const options = {
-      credential: mockCredential,
+      credential: myCredential,
       suite, documentLoader, compactProof: false
     };
     // const vc2 = await jsigs.sign(credential, { purpose, documentLoader, suite, ...options });
     const ProofSet = require('jsonld-signatures/lib/ProofSet');
     const compactProof = false;
-    const cred2 = { ...mockCredential };
+    const cred2 = { ...myCredential };
     const vc3 = await new ProofSet().add(cred2, { suite, purpose, documentLoader, expansionMap, compactProof });
     const input = { ...cred2 };
     const proofProperty = 'proof';
@@ -128,7 +128,7 @@ async function main() {
   };
   const c14nProofOptions = await suite.canonize(
     proof3, { documentLoader, expansionMap });
-  const cred3 = { ...mockCredential };
+  const cred3 = { ...myCredential };
   const c14nDocument = await suite.canonize(cred3, {
     documentLoader,
     expansionMap
